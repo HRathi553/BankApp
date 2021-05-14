@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -18,6 +19,12 @@ public class MainActivity extends AppCompatActivity {
     public static final int EDIT_USER_REQUEST = 1;
 
     private UsersViewModel usersViewModel;
+
+    String userName;
+    String userEmail;
+    String userAccount;
+    int userCurrentBalance;
+    int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +52,19 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new UsersAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Users users) {
+                userName = users.getName();
+                userEmail = users.getEmail();
+                userAccount = users.getAccount_number();
+                userCurrentBalance = users.getCurrent_balance();
+                id = users.getId();
+
+
                 Intent intent = new Intent(MainActivity.this,TransferMoney.class);
-                intent.putExtra(TransferMoney.EXTRA_ID,users.getId());
-                intent.putExtra(TransferMoney.EXTRA_NAME,users.getName());
-                intent.putExtra(TransferMoney.EXTRA_EMAIL,users.getEmail());
-                intent.putExtra(TransferMoney.EXTRA_ACCOUNT_NUMBER,users.getAccount_number());
-                intent.putExtra(TransferMoney.EXTRA_CURRENT_AMOUNT,users.getCurrent_balance());
+                intent.putExtra(TransferMoney.EXTRA_ID,id);
+                intent.putExtra(TransferMoney.EXTRA_NAME,userName);
+                intent.putExtra("currentEmail",userEmail);
+                intent.putExtra(TransferMoney.EXTRA_ACCOUNT_NUMBER,userAccount);
+                intent.putExtra("currentBalance",userCurrentBalance);
                 startActivityForResult(intent, EDIT_USER_REQUEST);
             }
         });
@@ -60,27 +74,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == EDIT_USER_REQUEST && resultCode == RESULT_OK){
-            int id = data.getIntExtra(TransferMoney.EXTRA_ID, -1);
+        if(requestCode == EDIT_USER_REQUEST && resultCode == Activity.RESULT_OK)
+        {
 
-            if(id == -1){
-                Toast.makeText(this, "User can't be updated", Toast.LENGTH_SHORT);
+            assert data != null;
+            int current_balance = data.getIntExtra(TransferMoney.EXTRA_CURRENT_AMOUNT, 1);
+
+            if(id == -1)
+            {
+                Toast.makeText(this, "User can't be updated", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String name = data.getStringExtra(TransferMoney.EXTRA_NAME);
-            String email = data.getStringExtra(TransferMoney.EXTRA_EMAIL);
-            String account_number = data.getStringExtra(TransferMoney.EXTRA_ACCOUNT_NUMBER);
-            int current_balance = data.getIntExtra(TransferMoney.EXTRA_CURRENT_AMOUNT, 1);
-
-            Users users = new Users(name,email,account_number,current_balance);
+            Users users = new Users(userName,userEmail,userAccount,current_balance);
             users.setId(id);
             usersViewModel.update(users);
-
-            Toast.makeText(this,"Money Transferred",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Money Transferred Successfully",Toast.LENGTH_SHORT).show();
         }
-        else{
+        else
+        {
             Toast.makeText(this,"Money not Transferred",Toast.LENGTH_SHORT).show();
+
         }
     }
 }

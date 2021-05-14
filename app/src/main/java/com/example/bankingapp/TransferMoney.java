@@ -34,6 +34,8 @@ public class TransferMoney extends AppCompatActivity {
     private TextView textViewTransferViewAccountNumber;
     private Button buttonTransferMoney;
 
+    int current_balance;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +53,11 @@ public class TransferMoney extends AppCompatActivity {
         if (intent.hasExtra(EXTRA_ID)) {
 //            setTitle("Edit Note");
             textViewTransferViewName.setText(intent.getStringExtra(EXTRA_NAME));
-            textViewTransferViewEmail.setText(intent.getStringExtra(Intent.EXTRA_EMAIL));
+            textViewTransferViewEmail.setText(intent.getStringExtra("currentEmail"));
             textViewTransferViewAccountNumber.setText(intent.getStringExtra(EXTRA_ACCOUNT_NUMBER));
-            textViewTransferViewBalance.setText(intent.getStringExtra(EXTRA_CURRENT_AMOUNT));
+            current_balance = intent.getIntExtra("currentBalance", 0);
+            textViewTransferViewBalance.setText("Rs: "+current_balance);
+
         }
 
 
@@ -64,26 +68,30 @@ public class TransferMoney extends AppCompatActivity {
                 buttonTransferMoney.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String name = textViewTransferViewName.getText().toString();
-                        String email = textViewTransferViewEmail.getText().toString();
-                        String account_number = textViewTransferViewAccountNumber.getText().toString();
-                        int current_balance = Integer.parseInt(textViewTransferViewBalance.getText().toString());
-                        int added_amount = Integer.parseInt(editTextAddAmount.getText().toString());
                         int id = getIntent().getIntExtra(EXTRA_ID,-1);
+
+                        int added_amount=0;
+                        if (!editTextAddAmount.getText().toString().equals(""))
+                        {
+                            added_amount = Integer.parseInt(editTextAddAmount.getText().toString());
+                        }
+
 
                         current_balance = current_balance + added_amount;
 
                         Intent data = new Intent();
-                        data.putExtra(EXTRA_NAME, name);
-                        data.putExtra(EXTRA_EMAIL, email);
-                        data.putExtra(EXTRA_ACCOUNT_NUMBER, account_number);
+
                         data.putExtra(EXTRA_CURRENT_AMOUNT,current_balance);
 
-                        if(id != -1){
+                        if(id != -1)
+                        {
                             data.putExtra(EXTRA_ID, id);
                         }
 
+
+
                         setResult(RESULT_OK,data);
+                        Toast.makeText(TransferMoney.this, "Send data Successfully"+id , Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
@@ -91,7 +99,3 @@ public class TransferMoney extends AppCompatActivity {
         });
     }
 }
-
-
-
-
