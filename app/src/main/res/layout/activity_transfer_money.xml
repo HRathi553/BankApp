@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="100dp"
             android:inputType="number"
-            android:text="3423"
+            android:text="34"
             android:textAlignment="center" />
 
          <Button
